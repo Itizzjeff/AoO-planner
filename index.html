@@ -59,22 +59,21 @@
   }
   .pin:hover .pin-inner { transform:scale(1.1); box-shadow:0 0 16px currentColor; }
   .pin.selected .pin-inner { transform:scale(1.15); outline:3px solid var(--gold); outline-offset:2px; }
-  /* Static pins (obelisks, outposts, ARK) — faint label only */
-  .pin-static { cursor:default; pointer-events:none; }
-  .pin-static .pin-inner {
-    background:rgba(0,0,0,0.35) !important; border-color:rgba(255,255,255,0.15) !important;
-    transform:none !important; box-shadow:none !important;
-  }
-  .pin-static .pin-icon { display:none; }
-  .pin-static .pin-label { font-size:7px !important; color:rgba(255,255,255,0.45) !important; font-weight:400 !important; }
   /* Interactive pins (shrines, altars) — vivid, with pulse on hover */
-  .pin:not(.pin-static) .pin-inner { box-shadow:0 0 8px currentColor; }
-  .pin:not(.pin-static):hover .pin-inner { transform:scale(1.15) !important; }
+  .pin .pin-inner { box-shadow:0 0 8px currentColor; }
   .pin-inner {
-    border-radius:6px; padding:4px 7px;
+    border-radius:6px; padding:5px 8px;
     display:flex; flex-direction:column; align-items:center; gap:2px;
-    transition:all 0.15s; border:2px solid; min-width:52px;
+    transition:all 0.15s; border:2px solid; min-width:44px;
     box-shadow:0 2px 8px rgba(0,0,0,0.5);
+  }
+  .pin::after {
+    content:"";
+    position:absolute;
+    bottom:-6px; left:50%; transform:translateX(-50%);
+    border:5px solid transparent;
+    border-top-color:rgba(255,255,255,0.5);
+    pointer-events:none;
   }
   .pin-icon { font-size:13px; line-height:1; }
   .pin-label { font-size:8px; font-weight:700; text-align:center; line-height:1.2; letter-spacing:0.3px; }
@@ -324,13 +323,13 @@ function save() {
 function buildPins() {
   const wrap = document.getElementById('mapWrap');
   BUILDINGS.forEach(b => {
-    const interactive = ['shrine','altar','sky'].includes(b.type);
+    if (!['shrine','altar','sky'].includes(b.type)) return;
     const pin = document.createElement('div');
-    pin.className = interactive ? 'pin' : 'pin pin-static';
+    pin.className = 'pin';
     pin.id = 'pin_' + b.id;
     pin.style.left = b.x + '%';
     pin.style.top  = b.y + '%';
-    if (interactive) pin.onclick = () => selectBuilding(b.id);
+    pin.onclick = () => selectBuilding(b.id);
     pin.innerHTML = buildPinHTML(b);
     wrap.appendChild(pin);
   });
