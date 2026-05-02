@@ -20,19 +20,19 @@
   header {
     background: linear-gradient(90deg,#1a0a00,#2d1500,#1a0a00);
     border-bottom: 2px solid var(--gold2);
-    padding: 10px 20px;
+    padding: 5px 16px;
     display: flex; align-items: center; justify-content: space-between;
     position: sticky; top: 0; z-index: 100;
     box-shadow: 0 4px 20px rgba(0,0,0,0.6);
   }
-  .logo { display:flex; align-items:center; gap:10px; }
-  .logo-icon { font-size:26px; }
-  .logo-title { font-family:'Cinzel',serif; font-size:18px; font-weight:700; color:var(--gold); letter-spacing:2px; }
-  .logo-sub { font-size:10px; color:var(--gold2); letter-spacing:3px; }
-  nav { display:flex; gap:6px; }
+  .logo { display:flex; align-items:center; gap:8px; }
+  .logo-icon { font-size:20px; }
+  .logo-title { font-family:'Cinzel',serif; font-size:14px; font-weight:700; color:var(--gold); letter-spacing:2px; }
+  .logo-sub { font-size:9px; color:var(--gold2); letter-spacing:3px; }
+  nav { display:flex; gap:5px; }
   nav button {
-    font-family:'Barlow',sans-serif; font-size:11px; font-weight:600;
-    padding:5px 14px; border-radius:4px; cursor:pointer; letter-spacing:1px;
+    font-family:'Barlow',sans-serif; font-size:10px; font-weight:600;
+    padding:4px 11px; border-radius:4px; cursor:pointer; letter-spacing:1px;
     text-transform:uppercase; transition:all 0.2s;
     border:1px solid var(--gold3); background:transparent; color:var(--gold2);
   }
@@ -43,15 +43,18 @@
   .tab.active { display:flex; flex-direction:column; }
 
   /* MAP TAB */
-  #tab-map { flex-direction:row; height:calc(100vh - 58px); overflow:hidden; }
-  .map-area { flex:1; overflow:auto; padding:16px; }
+  #tab-map { flex-direction:row; height:calc(100vh - 42px); overflow:hidden; }
+  .map-area { flex:1; overflow:hidden; padding:8px; display:flex; flex-direction:column; }
   .map-wrap {
     position:relative; border-radius:8px; overflow:hidden;
     border:2px solid var(--gold3);
     box-shadow:0 0 40px rgba(139,105,20,0.25), 0 0 80px rgba(0,0,0,0.5);
+    /* Constrain map to never exceed viewport height: max-width based on aspect ratio */
     width:100%;
+    max-width:calc((100vh - 90px) * 1.3061);
     padding-bottom:76.574%;
     height:0;
+    margin:0 auto;
   }
   .map-wrap img {
     position:absolute; top:0; left:0;
@@ -165,9 +168,9 @@
   .empty-state { color:var(--gold3); font-size:13px; text-align:center; margin-top:60px; }
 
   /* Legend */
-  .legend { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:10px; }
-  .legend-item { display:flex; align-items:center; gap:4px; font-size:10px; color:var(--gold2); }
-  .legend-dot { width:10px; height:10px; border-radius:50%; border:1px solid; }
+  .legend { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:5px; padding-bottom:4px; }
+  .legend-item { display:flex; align-items:center; gap:3px; font-size:9px; color:var(--gold2); }
+  .legend-dot { width:8px; height:8px; border-radius:50%; border:1px solid; }
 
   /* Tablet (iPad) */
   @media (max-width:1100px) and (min-width:701px) {
