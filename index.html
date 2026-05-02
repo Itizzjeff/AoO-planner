@@ -59,8 +59,17 @@
   }
   .pin:hover .pin-inner { transform:scale(1.1); box-shadow:0 0 16px currentColor; }
   .pin.selected .pin-inner { transform:scale(1.15); outline:3px solid var(--gold); outline-offset:2px; }
-  .pin-static { cursor:default; pointer-events:none; opacity:0.55; }
-  .pin-static .pin-inner { transform:none !important; box-shadow:none !important; background:#2a1f00 !important; border-color:#4a3800 !important; }
+  /* Static pins (obelisks, outposts, ARK) — faint label only */
+  .pin-static { cursor:default; pointer-events:none; }
+  .pin-static .pin-inner {
+    background:rgba(0,0,0,0.35) !important; border-color:rgba(255,255,255,0.15) !important;
+    transform:none !important; box-shadow:none !important;
+  }
+  .pin-static .pin-icon { display:none; }
+  .pin-static .pin-label { font-size:7px !important; color:rgba(255,255,255,0.45) !important; font-weight:400 !important; }
+  /* Interactive pins (shrines, altars) — vivid, with pulse on hover */
+  .pin:not(.pin-static) .pin-inner { box-shadow:0 0 8px currentColor; }
+  .pin:not(.pin-static):hover .pin-inner { transform:scale(1.15) !important; }
   .pin-inner {
     border-radius:6px; padding:4px 7px;
     display:flex; flex-direction:column; align-items:center; gap:2px;
@@ -508,6 +517,3 @@ init();
 </script>
 </body>
 </html>
-
-
-ich müsste das in meinem github hochladen das AoO Planner heisst, jannst du das bitte kurz machen
