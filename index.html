@@ -267,10 +267,10 @@
 
 <script>
 const BUILDINGS = [
-  {id:"obs_top",    label:"Obelisk",         type:"obelisk", x:53.5, y:13.5},
-  {id:"obs_left",   label:"Obelisk",         type:"obelisk", x:10.5, y:43.5},
-  {id:"obs_bot",    label:"Obelisk",         type:"obelisk", x:41.5, y:81.5},
-  {id:"obs_right",  label:"Obelisk",         type:"obelisk", x:86.5, y:47.5},
+  {id:"obs_top",    label:"Obelisk",         type:"obelisk", team:"A", x:53.5, y:13.5},
+  {id:"obs_left",   label:"Obelisk",         type:"obelisk", team:"A", x:10.5, y:43.5},
+  {id:"obs_bot",    label:"Obelisk",         type:"obelisk", team:"B", x:41.5, y:81.5},
+  {id:"obs_right",  label:"Obelisk",         type:"obelisk", team:"A", x:86.5, y:47.5},
   {id:"alt_dt",     label:"Desert Altar",    type:"altar",   team:"A", x:53.8, y:31.5},
   {id:"alt_db",     label:"Desert Altar",    type:"altar",   team:"B", x:41.5, y:63.5},
   {id:"shr_lt",     label:"Shrine of Life",  type:"shrine",  team:"A", x:68.5, y:16.5},
@@ -303,9 +303,45 @@ let assignments = {};
 let selectedId = null;
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
+function buildTeamDivider() {
+  const wrap = document.getElementById('mapWrap');
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox','0 0 100 100');
+  svg.setAttribute('preserveAspectRatio','none');
+  svg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:4;overflow:visible;';
+  // Diagonal line roughly through ARK (46.5%, 47.5%) from left edge to right edge
+  const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+  line.setAttribute('x1','0'); line.setAttribute('y1','35');
+  line.setAttribute('x2','100'); line.setAttribute('y2','60');
+  line.setAttribute('stroke','rgba(255,255,255,0.25)');
+  line.setAttribute('stroke-width','0.4');
+  line.setAttribute('stroke-dasharray','2,2');
+  svg.appendChild(line);
+  // Team A label (top half)
+  const lblA = document.createElementNS('http://www.w3.org/2000/svg','text');
+  lblA.setAttribute('x','2'); lblA.setAttribute('y','8');
+  lblA.setAttribute('fill','rgba(147,197,253,0.6)');
+  lblA.setAttribute('font-size','4');
+  lblA.setAttribute('font-family','Cinzel,serif');
+  lblA.setAttribute('letter-spacing','0.5');
+  lblA.textContent = 'TEAM A';
+  svg.appendChild(lblA);
+  // Team B label (bottom half)
+  const lblB = document.createElementNS('http://www.w3.org/2000/svg','text');
+  lblB.setAttribute('x','2'); lblB.setAttribute('y','97');
+  lblB.setAttribute('fill','rgba(252,165,165,0.6)');
+  lblB.setAttribute('font-size','4');
+  lblB.setAttribute('font-family','Cinzel,serif');
+  lblB.setAttribute('letter-spacing','0.5');
+  lblB.textContent = 'TEAM B';
+  svg.appendChild(lblB);
+  wrap.appendChild(svg);
+}
+
 function init() {
   buildLegend();
   buildPins();
+  buildTeamDivider();
   renderRoster();
   // Load from localStorage if available
   try {
@@ -330,7 +366,7 @@ function save() {
 function buildPins() {
   const wrap = document.getElementById('mapWrap');
   BUILDINGS.forEach(b => {
-    if (!['shrine','altar','sky'].includes(b.type)) return;
+    if (!['shrine','altar','sky','obelisk'].includes(b.type)) return;
     const pin = document.createElement('div');
     pin.className = 'pin';
     pin.id = 'pin_' + b.id;
