@@ -223,25 +223,15 @@
       </div>
       <hr class="divider">
       <div class="field-group">
-        <div class="field-label" style="color:#93c5fd">
-          <span class="dot" style="background:#3b82f6"></span> TEAM A
-        </div>
-        <select id="playerA" onchange="assign('playerA')">
+        <div class="field-label" style="color:#fcd34d">⚔️ RALLY LEADER</div>
+        <select id="rally" onchange="assign('rally')">
           <option value="">— Select player —</option>
-        </select>
-        <select id="roleA" onchange="assign('roleA')">
-          <option value="">— Role —</option>
         </select>
       </div>
       <div class="field-group">
-        <div class="field-label" style="color:#fca5a5">
-          <span class="dot" style="background:#ef4444"></span> TEAM B
-        </div>
-        <select id="playerB" onchange="assign('playerB')">
+        <div class="field-label" style="color:#86efac">🛡️ GARRISON LEADER</div>
+        <select id="garrison" onchange="assign('garrison')">
           <option value="">— Select player —</option>
-        </select>
-        <select id="roleB" onchange="assign('roleB')">
-          <option value="">— Role —</option>
         </select>
       </div>
       <div class="field-group">
@@ -275,14 +265,14 @@ const BUILDINGS = [
   {id:"obs_left",   label:"Obelisk",         type:"obelisk", x:10.5, y:43.5},
   {id:"obs_bot",    label:"Obelisk",         type:"obelisk", x:41.5, y:81.5},
   {id:"obs_right",  label:"Obelisk",         type:"obelisk", x:86.5, y:47.5},
-  {id:"alt_dt",     label:"Desert Altar",    type:"altar",   x:53.8, y:31.5},
-  {id:"alt_db",     label:"Desert Altar",    type:"altar",   x:41.5, y:63.5},
-  {id:"shr_lt",     label:"Shrine of Life",  type:"shrine",  x:68.5, y:16.5},
-  {id:"shr_lb",     label:"Shrine of Life",  type:"shrine",  x:25.5, y:78.5},
-  {id:"shr_wl",     label:"Shrine of War",   type:"shrine",  x:27.0, y:49.5},
-  {id:"shr_wr",     label:"Shrine of War",   type:"shrine",  x:65.0, y:43.0},
-  {id:"sky_r",      label:"Sky Altar",       type:"sky",     x:82.0, y:28.0},
-  {id:"sky_l",      label:"Sky Altar",       type:"sky",     x:11.5, y:60.5},
+  {id:"alt_dt",     label:"Desert Altar",    type:"altar",   team:"A", x:53.8, y:31.5},
+  {id:"alt_db",     label:"Desert Altar",    type:"altar",   team:"B", x:41.5, y:63.5},
+  {id:"shr_lt",     label:"Shrine of Life",  type:"shrine",  team:"A", x:68.5, y:16.5},
+  {id:"shr_lb",     label:"Shrine of Life",  type:"shrine",  team:"B", x:25.5, y:78.5},
+  {id:"shr_wl",     label:"Shrine of War",   type:"shrine",  team:"B", x:27.0, y:49.5},
+  {id:"shr_wr",     label:"Shrine of War",   type:"shrine",  team:"A", x:65.0, y:43.0},
+  {id:"sky_r",      label:"Sky Altar",       type:"sky",     team:"A", x:82.0, y:28.0},
+  {id:"sky_l",      label:"Sky Altar",       type:"sky",     team:"B", x:11.5, y:60.5},
   {id:"iset_1",     label:"Outpost of Iset", type:"outpost", x:34.5, y:17.5},
   {id:"iset_2",     label:"Outpost of Iset", type:"outpost", x:16.0, y:29.0},
   {id:"iset_3",     label:"Outpost of Iset", type:"outpost", x:33.5, y:32.5},
@@ -301,7 +291,6 @@ const TYPE_STYLE = {
   ark:     {bg:"#4a1942", border:"#f0abfc", icon:"⚰️",  color:"#f0abfc"},
 };
 
-const ROLES = ["Rally / garrison","Rally / garrison, Team C","Rally / Garrison, Filler","1 troop — fastest cmdr","Garrison Captain","Rally Leader","Backup","Wait list"];
 
 let players = ["Drunkgroot","FairPlay","Tuki","Urin"];
 let assignments = {};
@@ -312,7 +301,6 @@ function init() {
   buildLegend();
   buildPins();
   renderRoster();
-  populateRoleSelects();
   // Load from localStorage if available
   try {
     const saved = localStorage.getItem('aoo_data');
@@ -330,16 +318,6 @@ function save() {
   try { localStorage.setItem('aoo_data', JSON.stringify({players, assignments})); } catch(e){}
 }
 
-function populateRoleSelects() {
-  ['roleA','roleB'].forEach(id => {
-    const sel = document.getElementById(id);
-    ROLES.forEach(r => {
-      const o = document.createElement('option');
-      o.value = o.textContent = r;
-      sel.appendChild(o);
-    });
-  });
-}
 
 // ── MAP ───────────────────────────────────────────────────────────────────────
 
@@ -364,10 +342,10 @@ function buildPinHTML(b) {
   const isArk = b.type === 'ark';
   return `<div class="pin-inner" style="background:${s.bg};border-color:${s.border};${isArk?'border-radius:8px;min-width:62px;':''}">
     <span class="pin-icon">${s.icon}</span>
-    <span class="pin-label" style="color:${s.color}">${b.label}</span>
-    ${a.playerA || a.playerB ? `<div class="pin-badges">
-      ${a.playerA ? `<div class="badge badge-a">A: ${a.playerA}</div>` : ''}
-      ${a.playerB ? `<div class="badge badge-b">B: ${a.playerB}</div>` : ''}
+    <span class="pin-label" style="color:${s.color}">${b.label}${b.team ? ` <span style="font-size:6px;opacity:0.8">(${b.team})</span>` : ''}</span>
+    ${a.rally || a.garrison ? `<div class="pin-badges">
+      ${a.rally ? `<div class="badge badge-a">⚔️ ${a.rally}</div>` : ''}
+      ${a.garrison ? `<div class="badge badge-b">🛡️ ${a.garrison}</div>` : ''}
     </div>` : ''}
   </div>`;
 }
@@ -400,11 +378,12 @@ function selectBuilding(id) {
   const s = TYPE_STYLE[b.type];
   const a = assignments[id] || {};
 
-  document.getElementById('panelTitle').textContent = s.icon + ' ' + b.label;
+  const teamLabel = b.team ? ' — TEAM ' + b.team : '';
+  document.getElementById('panelTitle').textContent = s.icon + ' ' + b.label + teamLabel;
   document.getElementById('sidePanel').classList.remove('hidden');
 
   // Populate player selects
-  ['playerA','playerB'].forEach(field => {
+  ['rally','garrison'].forEach(field => {
     const sel = document.getElementById(field);
     sel.innerHTML = '<option value="">— Select player —</option>';
     players.forEach(p => {
@@ -415,8 +394,6 @@ function selectBuilding(id) {
     });
   });
 
-  document.getElementById('roleA').value  = a.roleA  || '';
-  document.getElementById('roleB').value  = a.roleB  || '';
   document.getElementById('noteField').value = a.notes || '';
 }
 
@@ -435,10 +412,8 @@ function clearAssignment() {
   delete assignments[selectedId];
   const pin = document.getElementById('pin_' + selectedId);
   if (pin) pin.innerHTML = buildPinHTML(BUILDINGS.find(b => b.id === selectedId));
-  document.getElementById('playerA').value = '';
-  document.getElementById('playerB').value = '';
-  document.getElementById('roleA').value = '';
-  document.getElementById('roleB').value = '';
+  document.getElementById('rally').value = '';
+  document.getElementById('garrison').value = '';
   document.getElementById('noteField').value = '';
   save();
 }
@@ -482,7 +457,7 @@ function removePlayer(name) {
 // ── SUMMARY ───────────────────────────────────────────────────────────────────
 function renderSummary() {
   const grid = document.getElementById('summaryGrid');
-  const assigned = BUILDINGS.filter(b => assignments[b.id]?.playerA || assignments[b.id]?.playerB);
+  const assigned = BUILDINGS.filter(b => assignments[b.id]?.rally || assignments[b.id]?.garrison);
   if (!assigned.length) {
     grid.innerHTML = '<div class="empty-state">No assignments yet.<br>Click buildings on the map to assign players.</div>';
     return;
@@ -493,8 +468,8 @@ function renderSummary() {
     return `<div class="summary-card" style="border-color:${s.border}">
       <div class="summary-card-title" style="color:${s.color}">${s.icon} ${b.label}</div>
       <div class="summary-assignments">
-        ${a.playerA ? `<div class="summary-assign"><span style="color:#93c5fd">A: ${a.playerA}</span>${a.roleA ? ` <span style="color:#5a4010">— ${a.roleA}</span>` : ''}</div>` : ''}
-        ${a.playerB ? `<div class="summary-assign"><span style="color:#fca5a5">B: ${a.playerB}</span>${a.roleB ? ` <span style="color:#5a4010">— ${a.roleB}</span>` : ''}</div>` : ''}
+        ${a.rally ? `<div class="summary-assign"><span style="color:#93c5fd">⚔️ ${a.rally}</span></div>` : ''}
+        ${a.garrison ? `<div class="summary-assign"><span style="color:#fca5a5">🛡️ ${a.garrison}</span></div>` : ''}
       </div>
       ${a.notes ? `<div class="summary-notes">📝 ${a.notes}</div>` : ''}
     </div>`;
