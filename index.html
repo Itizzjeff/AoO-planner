@@ -366,10 +366,10 @@ function buildPins() {
   BUILDINGS.forEach(b => {
     const pin = document.createElement('div');
     pin.className = 'pin';
-    [pin.id](http://pin.id) = 'pin_' + [b.id](http://b.id);
-    [pin.style](http://pin.style).left = b.x + '%';
-    [pin.style.top](http://pin.style.top)  = b.y + '%';
-    pin.onclick = () => selectBuilding([b.id](http://b.id));
+    pin.id = 'pin_' + b.id;
+    pin.style.left = b.x + '%';
+    pin.style.top  = b.y + '%';
+    pin.onclick = () => selectBuilding(b.id);
     pin.innerHTML = buildPinHTML(b);
     wrap.appendChild(pin);
   });
@@ -377,9 +377,9 @@ function buildPins() {
 
 function buildPinHTML(b) {
   const s = TYPE_STYLE[b.type];
-  const a = assignments[[b.id](http://b.id)] || {};
+  const a = assignments[b.id] || {};
   const isArk = b.type === 'ark';
-  return `<div class="pin-inner" style="background:${[s.bg](http://s.bg)};border-color:${s.border};${isArk?'border-radius:8px;min-width:62px;':''}">
+  return `<div class="pin-inner" style="background:${s.bg};border-color:${s.border};${isArk?'border-radius:8px;min-width:62px;':''}">
     <span class="pin-icon">${s.icon}</span>
     <span class="pin-label" style="color:${s.color}">${b.label}</span>
     ${a.playerA || a.playerB ? `<div class="pin-badges">
@@ -391,7 +391,7 @@ function buildPinHTML(b) {
 
 function refreshAllPins() {
   BUILDINGS.forEach(b => {
-    const pin = document.getElementById('pin_' + [b.id](http://b.id));
+    const pin = document.getElementById('pin_' + b.id);
     if (pin) pin.innerHTML = buildPinHTML(b);
   });
 }
@@ -400,7 +400,7 @@ function buildLegend() {
   const leg = document.getElementById('legend');
   Object.entries(TYPE_STYLE).forEach(([type, s]) => {
     leg.innerHTML += `<div class="legend-item">
-      <div class="legend-dot" style="background:${[s.bg](http://s.bg)};border-color:${s.border}"></div>
+      <div class="legend-dot" style="background:${s.bg};border-color:${s.border}"></div>
       ${s.icon} ${type}
     </div>`;
   });
@@ -413,7 +413,7 @@ function selectBuilding(id) {
   selectedId = id;
   document.getElementById('pin_' + id)?.classList.add('selected');
 
-  const b = BUILDINGS.find(x => [x.id](http://x.id) === id);
+  const b = BUILDINGS.find(x => x.id === id);
   const s = TYPE_STYLE[b.type];
   const a = assignments[id] || {};
 
@@ -443,7 +443,7 @@ function assign(field) {
   const el = document.getElementById(field === 'notes' ? 'noteField' : field);
   assignments[selectedId][field] = el.value;
   const pin = document.getElementById('pin_' + selectedId);
-  if (pin) pin.innerHTML = buildPinHTML(BUILDINGS.find(b => [b.id](http://b.id) === selectedId));
+  if (pin) pin.innerHTML = buildPinHTML(BUILDINGS.find(b => b.id === selectedId));
   save();
 }
 
@@ -451,7 +451,7 @@ function clearAssignment() {
   if (!selectedId) return;
   delete assignments[selectedId];
   const pin = document.getElementById('pin_' + selectedId);
-  if (pin) pin.innerHTML = buildPinHTML(BUILDINGS.find(b => [b.id](http://b.id) === selectedId));
+  if (pin) pin.innerHTML = buildPinHTML(BUILDINGS.find(b => b.id === selectedId));
   document.getElementById('playerA').value = '';
   document.getElementById('playerB').value = '';
   document.getElementById('roleA').value = '';
@@ -499,14 +499,14 @@ function removePlayer(name) {
 // ── SUMMARY ───────────────────────────────────────────────────────────────────
 function renderSummary() {
   const grid = document.getElementById('summaryGrid');
-  const assigned = BUILDINGS.filter(b => assignments[[b.id](http://b.id)]?.playerA || assignments[[b.id](http://b.id)]?.playerB);
+  const assigned = BUILDINGS.filter(b => assignments[b.id]?.playerA || assignments[b.id]?.playerB);
   if (!assigned.length) {
     grid.innerHTML = '<div class="empty-state">No assignments yet.<br>Click buildings on the map to assign players.</div>';
     return;
   }
-  grid.innerHTML = [assigned.map](http://assigned.map)(b => {
+  grid.innerHTML = assigned.map(b => {
     const s = TYPE_STYLE[b.type];
-    const a = assignments[[b.id](http://b.id)];
+    const a = assignments[b.id];
     return `<div class="summary-card" style="border-color:${s.border}">
       <div class="summary-card-title" style="color:${s.color}">${s.icon} ${b.label}</div>
       <div class="summary-assignments">
