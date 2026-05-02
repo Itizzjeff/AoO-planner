@@ -44,17 +44,19 @@
 
   /* MAP TAB */
   #tab-map { flex-direction:row; height:calc(100vh - 42px); overflow:hidden; }
-  .map-area { flex:1; overflow:hidden; padding:8px; display:flex; flex-direction:column; }
+  .map-area {
+    flex:1; overflow:hidden; padding:8px;
+    /* Constrain width so padding-bottom aspect-ratio never exceeds viewport height.
+       (padding-bottom % is relative to this element's width, map-wrap is width:100%) */
+    max-width:calc((100vh - 80px) / 0.76574);
+  }
   .map-wrap {
     position:relative; border-radius:8px; overflow:hidden;
     border:2px solid var(--gold3);
     box-shadow:0 0 40px rgba(139,105,20,0.25), 0 0 80px rgba(0,0,0,0.5);
-    /* Constrain map to never exceed viewport height: max-width based on aspect ratio */
     width:100%;
-    max-width:calc((100vh - 90px) * 1.3061);
     padding-bottom:76.574%;
     height:0;
-    margin:0 auto;
   }
   .map-wrap img {
     position:absolute; top:0; left:0;
