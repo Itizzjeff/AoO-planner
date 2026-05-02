@@ -341,8 +341,7 @@ function buildPinHTML(b) {
   const a = assignments[b.id] || {};
   const isArk = b.type === 'ark';
   return `<div class="pin-inner" style="background:${s.bg};border-color:${s.border};${isArk?'border-radius:8px;min-width:62px;':''}">
-    <span class="pin-icon">${s.icon}</span>
-    <span class="pin-label" style="color:${s.color}">${b.label}${b.team ? ` <span style="font-size:6px;opacity:0.8">(${b.team})</span>` : ''}</span>
+    <span class="pin-icon" style="font-size:18px">${s.icon}</span>
     ${a.rally || a.garrison ? `<div class="pin-badges">
       ${a.rally ? `<div class="badge badge-a">⚔️ ${a.rally}</div>` : ''}
       ${a.garrison ? `<div class="badge badge-b">🛡️ ${a.garrison}</div>` : ''}
@@ -359,10 +358,17 @@ function refreshAllPins() {
 
 function buildLegend() {
   const leg = document.getElementById('legend');
-  Object.entries(TYPE_STYLE).forEach(([type, s]) => {
+  const items = [
+    {icon:'⛩️', label:'Desert Altar', color:'#fcd34d', border:'#f59e0b'},
+    {icon:'☁️', label:'Sky Altar',    color:'#c4b5fd', border:'#a78bfa'},
+    {icon:'🏛️', label:'Shrine of Life / War', color:'#86efac', border:'#4ade80'},
+    {icon:'🔵', label:'Team A (upper)', color:'#93c5fd', border:'#3b82f6'},
+    {icon:'🔴', label:'Team B (lower)', color:'#fca5a5', border:'#ef4444'},
+  ];
+  items.forEach(it => {
     leg.innerHTML += `<div class="legend-item">
-      <div class="legend-dot" style="background:${s.bg};border-color:${s.border}"></div>
-      ${s.icon} ${type}
+      <div class="legend-dot" style="background:${it.color}33;border-color:${it.border}"></div>
+      ${it.icon} <span style="color:${it.color}">${it.label}</span>
     </div>`;
   });
 }
