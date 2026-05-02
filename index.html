@@ -95,6 +95,43 @@
   .badge-b { background:rgba(239,68,68,0.2); border-color:rgba(252,165,165,0.4); color:#fca5a5; }
 
   /* SIDE PANEL */
+  /* TEAM PANEL */
+  .team-panel {
+    width:155px; min-width:155px; background:#0e0800;
+    border-left:2px solid var(--gold3);
+    display:flex; flex-direction:column;
+    overflow-y:auto; padding:12px 10px; gap:10px;
+  }
+  .tp-title {
+    font-family:'Cinzel',serif; font-size:10px; font-weight:700;
+    color:var(--gold); letter-spacing:2px; text-align:center;
+    padding-bottom:8px; border-bottom:1px solid var(--gold3);
+  }
+  .tp-section { display:flex; flex-direction:column; gap:4px; }
+  .tp-head {
+    font-size:9px; font-weight:700; letter-spacing:2px;
+    padding:3px 6px; border-radius:4px; margin-bottom:2px;
+  }
+  .tp-head-a { background:rgba(59,130,246,0.15); color:#93c5fd; border:1px solid rgba(59,130,246,0.3); }
+  .tp-head-b { background:rgba(239,68,68,0.15); color:#fca5a5; border:1px solid rgba(239,68,68,0.3); }
+  .tp-player {
+    font-size:10px; padding:3px 7px; border-radius:3px;
+    color:var(--text); background:#1a1000; border:1px solid var(--border);
+  }
+  .tp-player-a { border-color:rgba(59,130,246,0.3); color:#bfdbfe; }
+  .tp-player-b { border-color:rgba(239,68,68,0.3); color:#fecaca; }
+  .tp-empty { font-size:9px; color:var(--gold3); padding:2px 6px; font-style:italic; }
+  .tp-divider { border-top:1px solid var(--border); margin:2px 0; }
+  /* Team toggle buttons in roster */
+  .team-btns { display:flex; gap:3px; }
+  .team-btn {
+    font-size:9px; font-weight:700; padding:2px 6px; border-radius:3px;
+    cursor:pointer; border:1px solid var(--gold3); background:transparent;
+    color:var(--gold3); transition:all 0.15s; letter-spacing:0.5px;
+  }
+  .team-btn.active-a { background:rgba(59,130,246,0.3); border-color:#3b82f6; color:#93c5fd; }
+  .team-btn.active-b { background:rgba(239,68,68,0.3); border-color:#ef4444; color:#fca5a5; }
+
   .side-panel {
     width:270px; min-width:270px; background:#120a00;
     border-left:2px solid var(--gold3);
@@ -223,6 +260,7 @@
     </div>
     <div class="legend" id="legend"></div>
   </div>
+  <div class="team-panel" id="teamPanel"></div>
   <div class="side-panel hidden" id="sidePanel">
     <div class="panel-inner">
       <div class="panel-top">
@@ -305,6 +343,7 @@ const TYPE_STYLE = {
 
 let players = ["Drunkgroot","FairPlay","Tuki","Urin"];
 let assignments = {};
+let playerTeams = {};
 let selectedId = null;
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
@@ -368,6 +407,7 @@ function init() {
   buildPins();
   buildTeamDivider();
   renderRoster();
+  renderTeamPanel();
   // Load from localStorage if available
   try {
     const saved = localStorage.getItem('aoo_data');
@@ -375,6 +415,7 @@ function init() {
       const d = JSON.parse(saved);
       players = d.players || players;
       assignments = d.assignments || {};
+      playerTeams = d.playerTeams || {};
       renderRoster();
       refreshAllPins();
     }
@@ -382,7 +423,7 @@ function init() {
 }
 
 function save() {
-  try { localStorage.setItem('aoo_data', JSON.stringify({players, assignments})); } catch(e){}
+  try { localStorage.setItem('aoo_data', JSON.stringify({players, assignments, playerTeams})); } catch(e){}
 }
 
 
@@ -502,12 +543,49 @@ function renderRoster() {
   const list = document.getElementById('playerList');
   list.innerHTML = '';
   players.forEach((p, i) => {
+    const t = playerTeams[p] || '';
     list.innerHTML += `<div class="player-row">
       <span class="player-num">${i+1}</span>
-      <span class="player-name">${p}</span>
+      <span class="player-name" style="flex:1">${p}</span>
+      <div class="team-btns">
+        <button class="team-btn${t==='A'?' active-a':''}" onclick="setPlayerTeam('${p}','A')">A</button>
+        <button class="team-btn${t==='B'?' active-b':''}" onclick="setPlayerTeam('${p}','B')">B</button>
+      </div>
       <button class="remove-btn" onclick="removePlayer('${p}')">✕</button>
     </div>`;
   });
+}
+
+function setPlayerTeam(name, team) {
+  playerTeams[name] = playerTeams[name] === team ? '' : team;
+  renderRoster();
+  renderTeamPanel();
+  save();
+}
+
+function renderTeamPanel() {
+  const panel = document.getElementById('teamPanel');
+  if (!panel) return;
+  const teamA = players.filter(p => playerTeams[p] === 'A');
+  const teamB = players.filter(p => playerTeams[p] === 'B');
+  const unassigned = players.filter(p => !playerTeams[p]);
+  panel.innerHTML = `
+    <div class="tp-title">TEAMS</div>
+    <div class="tp-section">
+      <div class="tp-head tp-head-a">🔵 TEAM A</div>
+      ${teamA.length ? teamA.map(p => `<div class="tp-player tp-player-a">${p}</div>`).join('') : '<div class="tp-empty">—</div>'}
+    </div>
+    <div class="tp-divider"></div>
+    <div class="tp-section">
+      <div class="tp-head tp-head-b">🔴 TEAM B</div>
+      ${teamB.length ? teamB.map(p => `<div class="tp-player tp-player-b">${p}</div>`).join('') : '<div class="tp-empty">—</div>'}
+    </div>
+    ${unassigned.length ? `<div class="tp-divider"></div>
+    <div class="tp-section">
+      <div class="tp-head" style="color:var(--gold2);border:1px solid var(--border);border-radius:4px;padding:3px 6px;">UNASSIGNED</div>
+      ${unassigned.map(p => `<div class="tp-player">${p}</div>`).join('')}
+    </div>` : ''}
+  `;
 }
 
 function addPlayer() {
@@ -517,13 +595,16 @@ function addPlayer() {
     players.push(name);
     inp.value = '';
     renderRoster();
+    renderTeamPanel();
     save();
   }
 }
 
 function removePlayer(name) {
   players = players.filter(p => p !== name);
+  delete playerTeams[name];
   renderRoster();
+  renderTeamPanel();
   save();
 }
 
