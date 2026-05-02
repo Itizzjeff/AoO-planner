@@ -545,11 +545,12 @@ function selectBuilding(id) {
   document.getElementById('panelTitle').textContent = s.icon + ' ' + b.label + teamLabel;
   document.getElementById('sidePanel').classList.remove('hidden');
 
-  // Populate player selects
+  // Populate player selects — filter by building team if assigned
+  const eligible = b.team ? players.filter(p => !playerTeams[p] || playerTeams[p] === b.team) : players;
   ['rally','garrison'].forEach(field => {
     const sel = document.getElementById(field);
     sel.innerHTML = '<option value="">— Select player —</option>';
-    players.forEach(p => {
+    eligible.forEach(p => {
       const o = document.createElement('option');
       o.value = o.textContent = p;
       if (a[field] === p) o.selected = true;
@@ -763,7 +764,8 @@ function importExcel(file) {
       if (ps) {
         const rows = XLSX.utils.sheet_to_json(ps, {header:1});
         const imported = rows
-          .map(r => r[0]).filter(v => v && typeof v === 'string' && v !== 'Player Name' && v !== 'PLAYER ROSTER');
+          .filter(r => r[0] && typeof r[0] === 'string' && typeof r[1] === 'number' && r[1] > 0)
+          .map(r => r[0]);
         if (imported.length) {
           const kept = {};
           imported.forEach(p => { if (playerTeams[p]) kept[p] = playerTeams[p]; });
