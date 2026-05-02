@@ -57,14 +57,6 @@
     position:absolute; transform:translate(-50%,-50%);
     cursor:pointer; transition:all 0.15s; z-index:5;
   }
-  .pin-label-only {
-    position:absolute; transform:translate(-50%,-50%);
-    pointer-events:none; z-index:3;
-    font-size:7px; color:rgba(255,255,255,0.5);
-    font-family:'Barlow',sans-serif; font-weight:500;
-    text-shadow:0 1px 3px rgba(0,0,0,0.8);
-    white-space:nowrap; letter-spacing:0.3px;
-  }
   .pin:hover .pin-inner { transform:scale(1.1); box-shadow:0 0 16px currentColor; }
   .pin.selected .pin-inner { transform:scale(1.15); outline:3px solid var(--gold); outline-offset:2px; }
   /* Interactive pins (shrines, altars) — vivid, with pulse on hover */
@@ -331,14 +323,14 @@ function save() {
 function buildPins() {
   const wrap = document.getElementById('mapWrap');
   BUILDINGS.forEach(b => {
-    const interactive = ['shrine','altar','sky'].includes(b.type);
+    if (!['shrine','altar','sky'].includes(b.type)) return;
     const pin = document.createElement('div');
-    pin.className = interactive ? 'pin' : 'pin-label-only';
+    pin.className = 'pin';
     pin.id = 'pin_' + b.id;
     pin.style.left = b.x + '%';
     pin.style.top  = b.y + '%';
-    if (interactive) pin.onclick = () => selectBuilding(b.id);
-    pin.innerHTML = interactive ? buildPinHTML(b) : `<span>${b.label}</span>`;
+    pin.onclick = () => selectBuilding(b.id);
+    pin.innerHTML = buildPinHTML(b);
     wrap.appendChild(pin);
   });
 }
