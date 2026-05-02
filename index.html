@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AoO Battle Planner</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -231,6 +232,41 @@
     nav button { padding:4px 8px; font-size:9px; }
     #tab-roster, #tab-summary { padding:12px; }
   }
+
+  /* STRATEGY TAB */
+  #tab-strategy { padding:18px; overflow-y:auto; height:calc(100vh - 42px); }
+  .strategy-inner { display:flex; gap:14px; max-width:1200px; margin:0 auto; align-items:flex-start; flex-wrap:wrap; }
+  .phase-card {
+    flex:1; min-width:240px; background:#1a1000; border:1px solid var(--gold3);
+    border-radius:8px; padding:14px; display:flex; flex-direction:column; gap:9px;
+  }
+  .phase-num { font-family:'Cinzel',serif; font-size:28px; font-weight:700; color:var(--gold3); line-height:1; }
+  .phase-title { font-family:'Cinzel',serif; font-size:13px; font-weight:700; color:var(--gold); letter-spacing:2px; margin-top:-4px; }
+  .phase-section-title { font-size:8px; letter-spacing:2px; color:var(--gold2); border-bottom:1px solid var(--border); padding-bottom:3px; margin-top:2px; text-transform:uppercase; }
+  .phase-notes { list-style:none; display:flex; flex-direction:column; gap:4px; padding:0; }
+  .phase-notes li { font-size:10px; padding:4px 8px; background:#0f0800; border-left:2px solid var(--gold3); border-radius:0 3px 3px 0; color:var(--text); }
+  .phase-tags { display:flex; flex-wrap:wrap; gap:4px; }
+  .phase-tag { font-size:9px; padding:2px 7px; border:1px solid var(--gold3); border-radius:4px; color:var(--gold2); background:#0f0800; }
+  .phase-tag-rally { border-color:#f59e0b; color:#fcd34d; background:rgba(245,158,11,0.1); }
+  .phase-teams { display:flex; gap:8px; }
+  .phase-team-col { flex:1; display:flex; flex-direction:column; gap:3px; }
+  .phase-team-head { font-size:8px; font-weight:700; letter-spacing:1.5px; padding:3px 6px; border-radius:4px; margin-bottom:2px; }
+  .phase-team-head-a { background:rgba(59,130,246,0.15); color:#93c5fd; border:1px solid rgba(59,130,246,0.3); }
+  .phase-team-head-b { background:rgba(239,68,68,0.15); color:#fca5a5; border:1px solid rgba(239,68,68,0.3); }
+  .phase-player { display:flex; flex-direction:column; padding:4px 7px; background:#0f0800; border-radius:4px; border:1px solid var(--border); }
+  .phase-player-name { font-size:11px; color:var(--text); font-weight:600; }
+  .phase-player-role { font-size:8px; color:var(--gold3); font-style:italic; margin-top:1px; }
+  .phase-wait-note { font-size:9px; color:#fcd34d; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); border-radius:4px; padding:5px 8px; }
+  .phase-rules { padding-left:16px; display:flex; flex-direction:column; gap:6px; margin:0; }
+  .phase-rules li { font-size:10px; color:var(--text); line-height:1.4; }
+  .phase-empty { font-size:9px; color:var(--gold3); font-style:italic; padding:3px 0; }
+  /* Import section */
+  .import-section { margin-top:24px; padding-top:18px; border-top:1px solid var(--border); }
+  .import-label { font-family:'Cinzel',serif; font-size:13px; color:var(--gold); font-weight:700; letter-spacing:2px; margin-bottom:10px; }
+  .import-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .import-btn { background:var(--gold3); border:1px solid var(--gold2); color:var(--gold); padding:7px 14px; border-radius:6px; cursor:pointer; font-family:'Barlow',sans-serif; font-size:12px; font-weight:700; transition:all 0.2s; }
+  .import-btn:hover { background:var(--gold2); }
+  #importStatus { font-size:11px; }
 </style>
 </head>
 <body>
@@ -246,6 +282,7 @@
   <nav>
     <button class="active" onclick="switchTab('map')">🗺️ Map</button>
     <button onclick="switchTab('roster')">👥 Roster</button>
+    <button onclick="switchTab('strategy')">⚔️ Strategy</button>
     <button onclick="switchTab('summary')">📋 Summary</button>
   </nav>
 </header>
@@ -300,7 +337,19 @@
     <button class="add-btn" onclick="addPlayer()">ADD</button>
   </div>
   <div class="player-list" id="playerList"></div>
+  <div class="import-section">
+    <div class="import-label">📥 IMPORT FROM EXCEL</div>
+    <div class="import-row">
+      <input type="file" id="xlsxInput" accept=".xlsx,.xls" style="display:none" onchange="importExcel(this.files[0])">
+      <button class="import-btn" onclick="document.getElementById('xlsxInput').click()">Choose .xlsx file</button>
+      <span id="importStatus"></span>
+    </div>
+    <div style="font-size:10px;color:var(--gold3);margin-top:8px;">Imports players + team assignments + strategy phases from your AoO Planning Excel.</div>
+  </div>
 </div>
+
+<!-- STRATEGY TAB -->
+<div id="tab-strategy" class="tab"></div>
 
 <!-- SUMMARY TAB -->
 <div id="tab-summary" class="tab">
@@ -630,6 +679,151 @@ function renderSummary() {
   }).join('');
 }
 
+// ── STRATEGY DATA ─────────────────────────────────────────────────────────────
+let strategyData = {
+  phase1: {
+    notes: ['Taxi Rally — Cav Rally','Ball at Altar','OUR Obelisk — Fast INF','Garrison: Gorgo / Toku / Hector','CRIT T1 Runners'],
+    garrison: ['OUR OBS','OUR ALTAR','OUR SHRINE','ENEMY ALTAR','ENEMY SHRINE'],
+    rally: ['ENEMY ALTAR','ENEMY SHRINE']
+  },
+  phase2: {
+    firstWave: {
+      teamA: [{name:'Drunkgroot',role:'Rally / garrison, Team C'},{name:'FairPlay',role:'Rally / garrison'}],
+      teamB: [{name:'Tuki',role:'Rally / Garrison, Filler'},{name:'Urin',role:'Rally / Garrison, Filler'}]
+    },
+    waitNote: 'WAIT — Only teleport once the first 16 players teleported'
+  },
+  phase3: {
+    rules: [
+      "Don't give the Ark to the enemy easily.",
+      "Hold until <8 min remaining (max 7 summons, aim for ~4).",
+      "Win Ark fight: carry to OUR obelisk, place in building at ~7 min.",
+      "Fine strategy: send rally to cross obelisk, cancel near Ark to take it.",
+      "No pointless field battles. Only the nominated C-team player roams."
+    ]
+  }
+};
+
+function renderStrategy() {
+  const tab = document.getElementById('tab-strategy');
+  if (!tab) return;
+  const d = strategyData;
+  const playerRow = (p) => `<div class="phase-player"><span class="phase-player-name">${p.name}</span>${p.role ? `<span class="phase-player-role">${p.role}</span>` : ''}</div>`;
+  tab.innerHTML = `<div class="strategy-inner">
+    <div class="phase-card">
+      <div class="phase-num">01</div>
+      <div class="phase-title">INITIAL MOVE</div>
+      <div class="phase-section-title">Tactics</div>
+      <ul class="phase-notes">${d.phase1.notes.map(n => `<li>${n}</li>`).join('')}</ul>
+      <div class="phase-section-title">Garrison Captains</div>
+      <div class="phase-tags">${d.phase1.garrison.map(g => `<span class="phase-tag">${g}</span>`).join('')}</div>
+      <div class="phase-section-title">Rally Leaders</div>
+      <div class="phase-tags">${d.phase1.rally.map(r => `<span class="phase-tag phase-tag-rally">${r}</span>`).join('')}</div>
+    </div>
+    <div class="phase-card">
+      <div class="phase-num">02</div>
+      <div class="phase-title">TELEPORT &amp; OCCUPY</div>
+      <div class="phase-section-title">First Wave — Teleport immediately</div>
+      <div class="phase-teams">
+        <div class="phase-team-col">
+          <div class="phase-team-head phase-team-head-a">🔵 TEAM A</div>
+          ${d.phase2.firstWave.teamA.length ? d.phase2.firstWave.teamA.map(playerRow).join('') : '<div class="phase-empty">—</div>'}
+        </div>
+        <div class="phase-team-col">
+          <div class="phase-team-head phase-team-head-b">🔴 TEAM B</div>
+          ${d.phase2.firstWave.teamB.length ? d.phase2.firstWave.teamB.map(playerRow).join('') : '<div class="phase-empty">—</div>'}
+        </div>
+      </div>
+      <div class="phase-wait-note">⏳ ${d.phase2.waitNote}</div>
+    </div>
+    <div class="phase-card">
+      <div class="phase-num">03</div>
+      <div class="phase-title">ARK BATTLE</div>
+      <div class="phase-section-title">Rules</div>
+      <ol class="phase-rules">${d.phase3.rules.map(r => `<li>${r}</li>`).join('')}</ol>
+    </div>
+  </div>`;
+}
+
+// ── EXCEL IMPORT ──────────────────────────────────────────────────────────────
+function importExcel(file) {
+  if (!file) return;
+  if (!window.XLSX) {
+    document.getElementById('importStatus').style.color = '#fca5a5';
+    document.getElementById('importStatus').textContent = '✗ SheetJS not loaded — check internet connection';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+
+      // 1. Players sheet
+      const ps = wb.Sheets['Players'];
+      if (ps) {
+        const rows = XLSX.utils.sheet_to_json(ps, {header:1});
+        const imported = rows
+          .map(r => r[0]).filter(v => v && typeof v === 'string' && v !== 'Player Name' && v !== 'PLAYER ROSTER');
+        if (imported.length) {
+          const kept = {};
+          imported.forEach(p => { if (playerTeams[p]) kept[p] = playerTeams[p]; });
+          players = imported;
+          playerTeams = kept;
+        }
+      }
+
+      // 2. AoO Planning sheet — Phase 2 teams + Phase 1 notes
+      const plan = wb.Sheets['AoO Planning'];
+      if (plan) {
+        const rows = XLSX.utils.sheet_to_json(plan, {header:1});
+        const newA = [], newB = [];
+        let readingWave = false;
+        rows.forEach(row => {
+          const c0 = row[0] ? String(row[0]) : '';
+          if (c0.includes('FIRST WAVE')) { readingWave = true; return; }
+          if (c0.includes('WAIT') || c0.includes('PHASE 3') || c0.includes('BACK UP')) readingWave = false;
+          if (readingWave) {
+            if (row[1] && typeof row[1] === 'string' && row[1] !== 'Team A') {
+              newA.push({name: row[1], role: row[2] || ''});
+              playerTeams[row[1]] = 'A';
+            }
+            if (row[5] && typeof row[5] === 'string' && row[5] !== 'Team B') {
+              newB.push({name: row[5], role: row[6] || ''});
+              playerTeams[row[5]] = 'B';
+            }
+          }
+        });
+        if (newA.length) strategyData.phase2.firstWave.teamA = newA;
+        if (newB.length) strategyData.phase2.firstWave.teamB = newB;
+
+        // Phase 1 notes
+        const p1 = [], inP1 = {v:false};
+        rows.forEach(row => {
+          const c0 = row[0] ? String(row[0]) : '';
+          if (c0.includes('PHASE 1')) { inP1.v = true; return; }
+          if (c0.includes('GARRISON') || c0.includes('RALLY') || c0.includes('PHASE 2')) inP1.v = false;
+          if (inP1.v && row[2] && typeof row[2] === 'string') p1.push(row[2]);
+        });
+        if (p1.length) strategyData.phase1.notes = p1;
+      }
+
+      renderRoster();
+      renderTeamPanel();
+      renderStrategy();
+      save();
+      const st = document.getElementById('importStatus');
+      st.style.color = '#86efac';
+      st.textContent = '✓ Import erfolgreich';
+      setTimeout(() => { st.textContent = ''; }, 3000);
+    } catch(err) {
+      const st = document.getElementById('importStatus');
+      st.style.color = '#fca5a5';
+      st.textContent = '✗ Fehler: ' + err.message;
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
 // ── TABS ──────────────────────────────────────────────────────────────────────
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -639,6 +833,7 @@ function switchTab(name) {
     if (b.textContent.toLowerCase().includes(name)) b.classList.add('active');
   });
   if (name === 'summary') renderSummary();
+  if (name === 'strategy') renderStrategy();
 }
 
 init();
