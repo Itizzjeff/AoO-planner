@@ -410,42 +410,42 @@ function buildTeamDivider() {
   line.setAttribute('stroke-width','0.5');
   line.setAttribute('stroke-dasharray','2,1.5');
   svg.appendChild(line);
-  // Team A label — upper-right of dividing line
+  // Team A label — top-right corner (no pins there)
   const bgA = document.createElementNS('http://www.w3.org/2000/svg','rect');
-  bgA.setAttribute('x','58'); bgA.setAttribute('y','6');
-  bgA.setAttribute('width','22'); bgA.setAttribute('height','7');
-  bgA.setAttribute('rx','1'); bgA.setAttribute('fill','rgba(30,58,138,0.55)');
+  bgA.setAttribute('x','76'); bgA.setAttribute('y','1.5');
+  bgA.setAttribute('width','22'); bgA.setAttribute('height','6.5');
+  bgA.setAttribute('rx','1.5'); bgA.setAttribute('fill','rgba(20,40,100,0.6)');
   svg.appendChild(bgA);
   const lblA = document.createElementNS('http://www.w3.org/2000/svg','text');
-  lblA.setAttribute('x','69'); lblA.setAttribute('y','11.5');
+  lblA.setAttribute('x','87'); lblA.setAttribute('y','7');
   lblA.setAttribute('text-anchor','middle');
   lblA.setAttribute('fill','#93c5fd');
-  lblA.setAttribute('font-size','5');
+  lblA.setAttribute('font-size','4.2');
   lblA.setAttribute('font-family','Cinzel,serif');
   lblA.setAttribute('font-weight','700');
   lblA.setAttribute('letter-spacing','1');
   lblA.setAttribute('paint-order','stroke');
-  lblA.setAttribute('stroke','rgba(0,0,0,0.6)');
-  lblA.setAttribute('stroke-width','0.8');
+  lblA.setAttribute('stroke','rgba(0,0,0,0.7)');
+  lblA.setAttribute('stroke-width','0.6');
   lblA.textContent = 'TEAM A';
   svg.appendChild(lblA);
-  // Team B label — lower-left of dividing line
+  // Team B label — bottom-right corner (no pins there)
   const bgB = document.createElementNS('http://www.w3.org/2000/svg','rect');
-  bgB.setAttribute('x','3'); bgB.setAttribute('y','85');
-  bgB.setAttribute('width','22'); bgB.setAttribute('height','7');
-  bgB.setAttribute('rx','1'); bgB.setAttribute('fill','rgba(127,29,29,0.55)');
+  bgB.setAttribute('x','76'); bgB.setAttribute('y','93');
+  bgB.setAttribute('width','22'); bgB.setAttribute('height','6.5');
+  bgB.setAttribute('rx','1.5'); bgB.setAttribute('fill','rgba(100,20,20,0.6)');
   svg.appendChild(bgB);
   const lblB = document.createElementNS('http://www.w3.org/2000/svg','text');
-  lblB.setAttribute('x','14'); lblB.setAttribute('y','90.5');
+  lblB.setAttribute('x','87'); lblB.setAttribute('y','98.5');
   lblB.setAttribute('text-anchor','middle');
   lblB.setAttribute('fill','#fca5a5');
-  lblB.setAttribute('font-size','5');
+  lblB.setAttribute('font-size','4.2');
   lblB.setAttribute('font-family','Cinzel,serif');
   lblB.setAttribute('font-weight','700');
   lblB.setAttribute('letter-spacing','1');
   lblB.setAttribute('paint-order','stroke');
-  lblB.setAttribute('stroke','rgba(0,0,0,0.6)');
-  lblB.setAttribute('stroke-width','0.8');
+  lblB.setAttribute('stroke','rgba(0,0,0,0.7)');
+  lblB.setAttribute('stroke-width','0.6');
   lblB.textContent = 'TEAM B';
   svg.appendChild(lblB);
   wrap.appendChild(svg);
