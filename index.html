@@ -311,11 +311,11 @@ function buildTeamDivider() {
   svg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:4;overflow:visible;';
   // Diagonal line roughly through ARK (46.5%, 47.5%) from left edge to right edge
   const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-  line.setAttribute('x1','0'); line.setAttribute('y1','35');
-  line.setAttribute('x2','100'); line.setAttribute('y2','60');
-  line.setAttribute('stroke','rgba(255,255,255,0.25)');
-  line.setAttribute('stroke-width','0.4');
-  line.setAttribute('stroke-dasharray','2,2');
+  line.setAttribute('x1','0'); line.setAttribute('y1','1');
+  line.setAttribute('x2','98'); line.setAttribute('y2','100');
+  line.setAttribute('stroke','rgba(255,255,255,0.3)');
+  line.setAttribute('stroke-width','0.5');
+  line.setAttribute('stroke-dasharray','2,1.5');
   svg.appendChild(line);
   // Team A label (top half)
   const lblA = document.createElementNS('http://www.w3.org/2000/svg','text');
