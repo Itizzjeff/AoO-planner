@@ -429,14 +429,14 @@ function buildTeamDivider() {
   lblA.setAttribute('stroke-width','0.6');
   lblA.textContent = 'TEAM A';
   svg.appendChild(lblA);
-  // Team B label — bottom-right corner (no pins there)
+  // Team B label — bottom-left corner (no pins there)
   const bgB = document.createElementNS('http://www.w3.org/2000/svg','rect');
-  bgB.setAttribute('x','76'); bgB.setAttribute('y','93');
+  bgB.setAttribute('x','2'); bgB.setAttribute('y','93');
   bgB.setAttribute('width','22'); bgB.setAttribute('height','6.5');
   bgB.setAttribute('rx','1.5'); bgB.setAttribute('fill','rgba(100,20,20,0.6)');
   svg.appendChild(bgB);
   const lblB = document.createElementNS('http://www.w3.org/2000/svg','text');
-  lblB.setAttribute('x','87'); lblB.setAttribute('y','98.5');
+  lblB.setAttribute('x','13'); lblB.setAttribute('y','98.5');
   lblB.setAttribute('text-anchor','middle');
   lblB.setAttribute('fill','#fca5a5');
   lblB.setAttribute('font-size','4.2');
